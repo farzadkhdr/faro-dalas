@@ -1,375 +1,1167 @@
 <!DOCTYPE html>
-<html lang="ckb" dir="rtl">
+<html lang="ku" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سیستەمی بەڕێوەبردنی مخزن و شت هێنان</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سیستەمی بەڕێوەبردنی کۆگا</title>
+<style>
+:root {
+  --bg: #f5f7fa;
+  --card: #ffffff;
+  --text: #1a202c;
+  --text2: #718096;
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --border: #e2e8f0;
+  --shadow: 0 4px 6px rgba(0,0,0,0.07);
+  --header: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
 
-        body {
-            background-color: #f4f6f9;
-            color: #333;
-            padding: 20px;
-        }
+[data-theme="dark"] {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: #f1f5f9;
+  --text2: #94a3b8;
+  --border: #334155;
+  --shadow: 0 4px 6px rgba(0,0,0,0.3);
+  --header: linear-gradient(135deg, #312e81 0%, #4c1d95 100%);
+}
 
-        header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        nav {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+body {
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: all 0.3s;
+  padding-bottom: 80px;
+}
 
-        nav button {
-            flex: 1;
-            padding: 12px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: 0.3s;
-        }
+/* ============ Header ============ */
+.header {
+  background: var(--header);
+  color: white;
+  padding: 20px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-        nav button:hover, nav button.active {
-            background-color: #2980b9;
-        }
+.header h1 { font-size: 18px; font-weight: 700; }
+.header .subtitle { font-size: 12px; opacity: 0.85; margin-top: 3px; }
 
-        .tab-content {
-            display: none;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
+.theme-toggle {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-        .tab-content.active {
-            display: block;
-        }
+.theme-toggle:hover { background: rgba(255,255,255,0.35); transform: rotate(20deg); }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+/* ============ Content ============ */
+.container { padding: 16px; max-width: 700px; margin: 0 auto; }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
+.page { display: none; animation: fadeIn 0.4s; }
+.page.active { display: block; }
 
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-        }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-        button.btn-action {
-            background-color: #2ecc71;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 15px;
-        }
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
 
-        button.btn-action:hover {
-            background-color: #27ae60;
-        }
+.card-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
+/* ============ Inputs ============ */
+.input, .select, textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  margin-bottom: 10px;
+  transition: 0.2s;
+}
 
-        table, th, td {
-            border: 1px solid #ddd;
-        }
+.input:focus, .select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79,70,229,0.15);
+}
 
-        th, td {
-            padding: 10px;
-            text-align: center;
-        }
+.label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text2);
+}
 
-        th {
-            background-color: #f2f2f2;
-        }
+.btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  background: var(--primary);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  font-family: inherit;
+  width: 100%;
+}
 
-        .product-img {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
+.btn:hover { background: var(--primary-hover); transform: translateY(-1px); }
+.btn:active { transform: scale(0.98); }
+.btn.success { background: var(--success); }
+.btn.danger { background: var(--danger); }
+.btn.warning { background: var(--warning); }
+.btn-sm { padding: 8px 14px; font-size: 12px; width: auto; }
 
-        .recommendation {
-            background-color: #fff3cd;
-            border: 1px solid #ffeeba;
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-        }
-    </style>
+.btn-row { display: flex; gap: 8px; }
+
+/* ============ Search box ============ */
+.search-box { position: relative; margin-bottom: 14px; }
+
+.search-box input { padding-right: 44px; margin: 0; }
+
+.search-box::before {
+  content: '🔍';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  z-index: 2;
+}
+
+/* ============ Shopkeeper Cards ============ */
+.shopkeeper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: var(--card);
+  border-radius: 14px;
+  margin-bottom: 10px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.shopkeeper:hover, .shopkeeper:active {
+  transform: translateX(-4px);
+  border-color: var(--primary);
+  box-shadow: var(--shadow);
+}
+
+.avatar {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: var(--header);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.sk-info h4 { font-size: 15px; margin-bottom: 3px; }
+.sk-info p { font-size: 12px; color: var(--text2); }
+
+.sk-badge {
+  margin-right: auto;
+  background: var(--primary);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ============ Product Grid ============ */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.product-card {
+  background: var(--card);
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.product-card:hover { transform: translateY(-3px); }
+
+.product-card img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  background: var(--bg);
+}
+
+.product-card .no-img {
+  width: 100%;
+  height: 120px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  color: white;
+}
+
+.product-info { padding: 10px; }
+.product-info h4 { font-size: 14px; margin-bottom: 5px; }
+.product-info .price { color: var(--success); font-weight: 700; font-size: 14px; }
+.product-info .qty { font-size: 11px; color: var(--text2); margin-top: 4px; }
+
+/* ============ Bottom Nav ============ */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 4px;
+  z-index: 200;
+  box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 2px;
+  background: none;
+  border: none;
+  color: var(--text2);
+  font-size: 10px;
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: 0.2s;
+}
+
+.nav-item .icon { font-size: 20px; }
+
+.nav-item.active {
+  color: var(--primary);
+  background: rgba(79,70,229,0.1);
+  font-weight: 700;
+}
+
+/* ============ Invoice ============ */
+.invoice-item {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 10px;
+  border-right: 4px solid var(--primary);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+
+.invoice-item h4 { font-size: 14px; margin-bottom: 5px; }
+.invoice-item .meta { font-size: 12px; color: var(--text2); display: flex; justify-content: space-between; margin-top: 6px; }
+.invoice-item .amount { color: var(--success); font-weight: 700; }
+
+/* ============ Modal ============ */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  backdrop-filter: blur(4px);
+}
+
+.modal-overlay.active { display: flex; animation: fadeIn 0.3s; }
+
+.modal {
+  background: var(--card);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 20px;
+  animation: slideUp 0.3s;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-header h3 { font-size: 17px; }
+
+.close-btn {
+  background: var(--bg);
+  border: none;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--text);
+}
+
+/* ============ Invoice Detail ============ */
+.inv-detail {
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+.inv-detail .row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed var(--border);
+  padding: 6px 0;
+}
+
+.inv-detail .row:last-child { border: none; }
+
+.inv-detail .row strong { color: var(--primary); }
+
+.total-box {
+  background: var(--success);
+  color: white;
+  padding: 14px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+/* ============ Image Upload ============ */
+.img-upload {
+  width: 100%;
+  height: 160px;
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-bottom: 12px;
+  background: var(--bg);
+  overflow: hidden;
+  position: relative;
+}
+
+.img-upload img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+.img-upload .ph { font-size: 36px; color: var(--text2); }
+.img-upload .txt { font-size: 12px; color: var(--text2); margin-top: 6px; }
+
+/* ============ Empty state ============ */
+.empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text2);
+}
+
+.empty .ico { font-size: 55px; margin-bottom: 12px; }
+.empty p { font-size: 14px; }
+
+/* ============ Stats ============ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat {
+  background: var(--card);
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.stat .num { font-size: 24px; font-weight: 700; color: var(--primary); }
+.stat .lbl { font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+/* ============ Toast ============ */
+.toast {
+  position: fixed;
+  bottom: 90px;
+  right: 50%;
+  transform: translateX(50%) translateY(100px);
+  background: var(--text);
+  color: var(--bg);
+  padding: 12px 22px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 2000;
+  opacity: 0;
+  transition: 0.3s;
+  pointer-events: none;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+.toast.show { transform: translateX(50%) translateY(0); opacity: 1; }
+
+/* ============ Backup ============ */
+.backup-box {
+  text-align: center;
+  padding: 20px;
+  border: 2px dashed var(--border);
+  border-radius: 14px;
+  margin-bottom: 12px;
+  background: var(--bg);
+}
+
+.backup-box .ico { font-size: 42px; margin-bottom: 8px; }
+.backup-box p { font-size: 13px; color: var(--text2); margin-bottom: 12px; }
+
+.file-input { display: none; }
+
+@media (max-width: 400px) {
+  .product-grid { grid-template-columns: repeat(2, 1fr); }
+  .header h1 { font-size: 16px; }
+}
+</style>
 </head>
 <body>
 
-    <header>
-        <h2>سیستەمی بەڕێوەبردنی کۆگا و کڕین (مخزن)</h2>
-    </header>
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <h1>📦 سیستەمی کۆگا</h1>
+    <div class="subtitle" id="pageSubtitle">بەڕێوەبردنی کاڵا و فرۆشتن</div>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</button>
+</div>
 
-    <nav>
-        <button class="active" onclick="openTab('purchase-tab', this)">بەشی شت هێنان</button>
-        <button onclick="openTab('inventory-tab', this)">بەشی مخزن</button>
-        <button onclick="openTab('backup-tab', this)">باكه‌پ و گه‌ڕاندنه‌وه‌</button>
-    </nav>
+<div class="container">
 
-    <!-- 1. بەشی شت هێنان -->
-    <div id="purchase-tab" class="tab-content active">
-        <h3>کڕین و وەگرتنی کاڵا</h3>
-        
-        <div class="recommendation" id="low-stock-alert">
-            <strong>پێشنیاری کڕین:</strong> هیچ کاڵایەک لە ئاستی مەترسیداردا نییە.
-        </div>
-
-        <div class="form-group">
-            <label>گەڕان یان هەڵبژاردنی دوکاندار:</label>
-            <input type="text" id="supplier-search" placeholder="ناوی دوکاندار بنووسە..." oninput="filterSuppliers()">
-            <select id="supplier-select" style="margin-top: 5px;">
-                <option value="">-- دوکاندارێک هەڵبژێرە --</option>
-                <option value="شێرکۆ">دوکانی شێرکۆ</option>
-                <option value="ئاریان">کۆمپانیای ئاریان</option>
-                <option value="کاروان">کۆگای کاروان</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>گەڕان بەدوای کاڵا:</label>
-            <select id="product-select">
-                <option value="">-- کاڵا هەڵبژێرە --</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>بڕی هاتنی کاڵا (ژمارە):</label>
-            <input type="number" id="purchase-qty" min="1" value="1">
-        </div>
-
-        <button class="btn-action" onclick="addStock()">تۆمارکردن و زیادکردن بۆ مخزن</button>
+  <!-- ========== PAGE: HOME (کەسەکان) ========== -->
+  <div class="page active" id="page-home">
+    <div class="search-box">
+      <input type="text" class="input" placeholder="گەڕان بەدوای ناوی دوکاندار..." id="searchSk" oninput="renderShopkeepers()">
     </div>
 
-    <!-- 2. بەشی مخزن -->
-    <div id="inventory-tab" class="tab-content">
-        <h3>زیادکردنی کاڵای نوێ</h3>
-        <div class="form-group">
-            <label>ناوی کاڵا:</label>
-            <input type="text" id="new-item-name" placeholder="ناوی کاڵا">
-        </div>
-        <div class="form-group">
-            <label>بڕی سەرەتایی:</label>
-            <input type="number" id="new-item-qty" min="0" value="0">
-        </div>
-        <div class="form-group">
-            <label>وێنەی کاڵا (بە شێوەی لینک/URL):</label>
-            <input type="text" id="new-item-img" placeholder="https://example.com/image.jpg">
-        </div>
-        <button class="btn-action" onclick="addNewProduct()">زیادکردنی کاڵا</button>
-
-        <hr style="margin: 20px 0;">
-
-        <h3>لیستی کاڵاکانی کۆگا</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>وێنە</th>
-                    <th>ناوی کاڵا</th>
-                    <th>بڕی ناو مخزن</th>
-                </tr>
-            </thead>
-            <tbody id="inventory-list">
-                <!-- ژمارەی کاڵاکان لێرە دەردەکەون -->
-            </tbody>
-        </table>
+    <div class="stats-grid">
+      <div class="stat"><div class="num" id="statSk">0</div><div class="lbl">دوکاندار</div></div>
+      <div class="stat"><div class="num" id="statInv">0</div><div class="lbl">فاکتور</div></div>
     </div>
 
-    <!-- 3. بەشی باکەپ -->
-    <div id="backup-tab" class="tab-content">
-        <h3>دروستکردن و گەڕاندنەوەی باکەپ</h3>
-        <br>
-        <button class="btn-action" onclick="downloadBackup()">داگرتنی باکەپ (JSON)</button>
-        <br><br>
-        <hr>
-        <br>
-        <div class="form-group">
-            <label>گەڕاندنەوەی باکەپ لە ڕێگەی فایل:</label>
-            <input type="file" id="restore-file" accept=".json">
-        </div>
-        <button class="btn-action" style="background-color: #e67e22;" onclick="restoreBackup()">گەڕاندنەوەی زانیارییەکان</button>
+    <div class="card-title">👥 لیستی دوکانداران</div>
+    <div id="shopkeepersList"></div>
+
+    <button class="btn" style="margin-top:10px;background:var(--success);" onclick="openAddShopkeeper()">➕ زیادکردنی دوکاندار</button>
+  </div>
+
+  <!-- ========== PAGE: PRODUCTS (شت هینان) ========== -->
+  <div class="page" id="page-products">
+    <div class="card">
+      <div class="card-title">🛒 شت هێنان (وەرگرتنی کاڵا)</div>
+      <label class="label">دوکاندار</label>
+      <select class="select" id="sellShopkeeper"></select>
+
+      <label class="label">کاڵا</label>
+      <select class="select" id="sellProduct"></select>
+
+      <label class="label">بڕی هاتنی کاڵا</label>
+      <input type="number" class="input" id="sellQty" placeholder="بڕی کاڵا بنووسە" min="1" value="1">
+
+      <button class="btn success" onclick="addStock()">✅ زیادکردنی بڕی هاتوو</button>
     </div>
 
-    <script>
-        // داتای ئامادەکراوی سەرەتایی (Data Base)
-        let inventory = JSON.parse(localStorage.getItem('sys_inventory')) || [
-            { id: 1, name: "کێک", qty: 5, img: "https://via.placeholder.com/50" },
-            { id: 2, name: "بەقڵاوە", qty: 2, img: "https://via.placeholder.com/50" }
-        ];
+    <div class="card">
+      <div class="card-title">💡 پێشنیاری کاڵاکان</div>
+      <div id="suggestionsList"></div>
+    </div>
+  </div>
 
-        // ڕێنیشاندانی تابەکان (Tab Navigation)
-        function openTab(tabId, btnElement) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            btnElement.classList.add('active');
-            renderUI();
-        }
+  <!-- ========== PAGE: STORAGE (مخزن) ========== -->
+  <div class="page" id="page-storage">
+    <div class="search-box">
+      <input type="text" class="input" placeholder="گەڕان بەدوای کاڵاکان..." id="searchProd" oninput="renderProducts()">
+    </div>
 
-        // نوێکردنەوەی زانیارییەکانی سەر شاشە
-        function renderUI() {
-            // پاشەکەوتکردن لە LocalStorage
-            localStorage.setItem('sys_inventory', JSON.stringify(inventory));
+    <div class="card">
+      <div class="card-title">➕ زیادکردنی کاڵا بۆ مخزن</div>
+      <label class="label">ناوی کاڵا</label>
+      <input type="text" class="input" id="prodName" placeholder="ناوی کاڵا بنووسە">
 
-            // نوێکردنەوەی خشتەی مخزن
-            const list = document.getElementById('inventory-list');
-            const select = document.getElementById('product-select');
-            list.innerHTML = '';
-            select.innerHTML = '<option value="">-- کاڵا هەڵبژێرە --</option>';
+      <label class="label">نرخی کاڵا</label>
+      <input type="number" class="input" id="prodPrice" placeholder="نرخ بە دینار">
 
-            let lowStockItems = [];
+      <label class="label">بڕی سەرەتا</label>
+      <input type="number" class="input" id="prodQty" placeholder="بڕی کاڵا" value="0">
 
-            inventory.forEach(item => {
-                // تێکردن لە خشتە
-                list.innerHTML += `
-                    <tr>
-                        <td><img src="${item.img}" class="product-img" onerror="this.src='https://via.placeholder.com/50'"></td>
-                        <td>${item.name}</td>
-                        <td>${item.qty}</td>
-                    </tr>
-                `;
-                // تێکردن لە لیستەکەی شت هێنان
-                select.innerHTML += `<option value="${item.id}">${item.name} (لە کۆگا: ${item.qty})</option>`;
+      <label class="label">وێنەی کاڵا</label>
+      <div class="img-upload" id="imgUpload" onclick="document.getElementById('prodImg').click()">
+        <div class="ph">📷</div>
+        <div class="txt">کلیک بکە بۆ هەڵبژاردنی وێنە</div>
+      </div>
+      <input type="file" id="prodImg" class="file-input" accept="image/*" onchange="previewImage(event)">
 
-                // پشکنین بۆ کاڵای کەم بووەوە
-                if (item.qty <= 3) {
-                    lowStockItems.push(item.name);
-                }
-            });
+      <button class="btn" onclick="addProduct()">✅ زیادکردنی کاڵا</button>
+    </div>
 
-            // ئاگاداری کاڵای کەم
-            const alertBox = document.getElementById('low-stock-alert');
-            if(lowStockItems.length > 0) {
-                alertBox.innerHTML = `<strong>پێشنیاری کڕین:</strong> بڕی ئەم کاڵایانە کەمە لە کۆگا: <span style="color:red;">${lowStockItems.join(', ')}</span>`;
-            } else {
-                alertBox.innerHTML = `<strong>پێشنیاری کڕین:</strong> سەرجەم کاڵاکان بە بڕی پێویست بەردەستن.`;
-            }
-        }
+    <div class="card-title">📦 کاڵاکانی مخزن</div>
+    <div class="product-grid" id="productsGrid"></div>
+  </div>
 
-        // گەڕانی دوکاندار
-        function filterSuppliers() {
-            let filter = document.getElementById('supplier-search').value.toLowerCase();
-            let select = document.getElementById('supplier-select');
-            for (let option of select.options) {
-                if (option.value === "") continue;
-                option.style.display = option.text.toLowerCase().includes(filter) ? "" : "none";
-            }
-        }
+  <!-- ========== PAGE: BACKUP ========== -->
+  <div class="page" id="page-backup">
+    <div class="card">
+      <div class="card-title">💾 باکەپ</div>
+      <div class="backup-box">
+        <div class="ico">📤</div>
+        <p>هەموو داتاکانی سیستەم وەک فایلێک دابگرە</p>
+        <button class="btn" onclick="exportBackup()">داگرتنی باکەپ</button>
+      </div>
+    </div>
 
-        // زیادرکردنی بڕ لە بەشی شت هێنان
-        function addStock() {
-            let supplier = document.getElementById('supplier-select').value;
-            let productId = parseInt(document.getElementById('product-select').value);
-            let qty = parseInt(document.getElementById('purchase-qty').value);
+    <div class="card">
+      <div class="card-title">♻️ گەڕاندنەوەی باکەپ</div>
+      <div class="backup-box">
+        <div class="ico">📥</div>
+        <p>فایلی باکەپی پێشوو هەڵبژێرە بۆ گەڕاندنەوە</p>
+        <button class="btn warning" onclick="document.getElementById('restoreFile').click()">هەڵبژاردنی فایل</button>
+        <input type="file" id="restoreFile" class="file-input" accept=".json" onchange="importBackup(event)">
+      </div>
+    </div>
 
-            if (!supplier) { alert("تکایە پێشتر دوکاندار هەڵبژێرە!"); return; }
-            if (!productId) { alert("تکایە کاڵا هەڵبژێرە!"); return; }
-            if (qty <= 0) { alert("بڕی کاڵا دەبێت لە ٠ گەورەتر بێت!"); return; }
+    <div class="card">
+      <div class="card-title">⚠️ سڕینەوەی داتا</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">ئەمە هەموو داتاکان دەسڕێتەوە و ناگەڕێتەوە!</p>
+      <button class="btn danger" onclick="clearAll()">🗑️ سڕینەوەی هەموو داتا</button>
+    </div>
+  </div>
 
-            let item = inventory.find(i => i.id === productId);
-            if (item) {
-                item.qty += qty;
-                alert(`بڕی (${qty}) دانە بە سەرکەوتوویی بۆ (${item.name}) زیادکرا لە دوکانی [${supplier}]`);
-                renderUI();
-            }
-        }
+</div>
 
-        // زیادکردنی کاڵای نوێ بۆ مخزن
-        function addNewProduct() {
-            let name = document.getElementById('new-item-name').value;
-            let qty = parseInt(document.getElementById('new-item-qty').value);
-            let img = document.getElementById('new-item-img').value || 'https://via.placeholder.com/50';
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="nav-item active" onclick="switchPage('home',this,'کەسەکان')">
+    <span class="icon">👥</span>
+    <span>کەسەکان</span>
+  </button>
+  <button class="nav-item" onclick="switchPage('products',this,'شت هێنان')">
+    <span class="icon">🛒</span>
+    <span>شت هێنان</span>
+  </button>
+  <button class="nav-item" onclick="switchPage('storage',this,'مخزن')">
+    <span class="icon">📦</span>
+    <span>مخزن</span>
+  </button>
+  <button class="nav-item" onclick="switchPage('backup',this,'باکەپ')">
+    <span class="icon">💾</span>
+    <span>باکەپ</span>
+  </button>
+</div>
 
-            if (!name) { alert("تکایە ناوی کاڵا بنووسە!"); return; }
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal" id="modalContent"></div>
+</div>
 
-            let newItem = {
-                id: Date.now(),
-                name: name,
-                qty: qty || 0,
-                img: img
-            };
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
-            inventory.push(newItem);
-            document.getElementById('new-item-name').value = '';
-            document.getElementById('new-item-qty').value = '0';
-            document.getElementById('new-item-img').value = '';
+<script>
+/* ============================================================
+   DATA MANAGEMENT
+   ============================================================ */
+let data = {
+  shopkeepers: [],
+  products: [],
+  invoices: [],
+  stockMovements: []
+};
 
-            alert("کاڵای نوێ تۆمارکرا!");
-            renderUI();
-        }
+function save() {
+  localStorage.setItem('stockSystem', JSON.stringify(data));
+}
 
-        // باکەپ داگرتن (Download Backup)
-        function downloadBackup() {
-            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(inventory));
-            let downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `backup_inventory_${new Date().toISOString().slice(0,10)}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
+function load() {
+  const saved = localStorage.getItem('stockSystem');
+  if (saved) {
+    try { data = JSON.parse(saved); } catch(e) { console.log(e); }
+  }
+}
 
-        // گەڕاندنەوەی باکەپ (Restore Backup)
-        function restoreBackup() {
-            let fileInput = document.getElementById('restore-file');
-            if (fileInput.files.length === 0) {
-                alert("تکایە پێشتر فایلێکی باکەپ هەڵبژێرە!");
-                return;
-            }
+/* ============================================================
+   THEME
+   ============================================================ */
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isDark ? '🌙' : '☀️';
+  localStorage.setItem('theme', isDark ? 'light' : 'dark');
+}
 
-            let reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    let restoredData = JSON.parse(e.target.result);
-                    if (Array.isArray(restoredData)) {
-                        inventory = restoredData;
-                        renderUI();
-                        alert("زانیارییەکان بە سەرکەوتوویی گەڕێنرانەوە!");
-                    } else {
-                        alert("فایلی هەڵبژێردراو شیاو نییە.");
-                    }
-                } catch (err) {
-                    alert("هەڵەیەک ڕوویدا لە خوێندنەوەی فایلەکە!");
-                }
-            };
-            reader.readAsText(fileInput.files[0]);
-        }
+function loadTheme() {
+  const theme = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('themeBtn').textContent = theme === 'dark' ? '☀️' : '🌙';
+}
 
-        // دەستپێکردنی سەرەتایی
-        renderUI();
-    </script>
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+function switchPage(page, btn, subtitle) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  btn.classList.add('active');
+  document.getElementById('pageSubtitle').textContent = subtitle;
+  
+  if (page === 'home') renderShopkeepers();
+  if (page === 'products') { renderSellOptions(); renderSuggestions(); }
+  if (page === 'storage') renderProducts();
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ============================================================
+   SHOPKEEPERS
+   ============================================================ */
+function renderShopkeepers() {
+  const q = document.getElementById('searchSk').value.trim().toLowerCase();
+  const list = document.getElementById('shopkeepersList');
+  const filtered = data.shopkeepers.filter(s => s.name.toLowerCase().includes(q));
+
+  document.getElementById('statSk').textContent = data.shopkeepers.length;
+  document.getElementById('statInv').textContent = data.invoices.length;
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty"><div class="ico">👤</div><p>هیچ دوکاندارێک نەدۆزرایەوە</p></div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(s => `
+    <div class="shopkeeper" onclick="openShopkeeper(${s.id})">
+      <div class="avatar">${s.name.charAt(0)}</div>
+      <div class="sk-info">
+        <h4>${s.name}</h4>
+        <p>${s.phone || 'بێ ژمارە'}</p>
+      </div>
+      <div class="sk-badge">${s.invoices ? s.invoices.length : 0} فاکتور</div>
+    </div>
+  `).join('');
+}
+
+function openAddShopkeeper() {
+  openModal(`
+    <div class="modal-header">
+      <h3>➕ زیادکردنی دوکاندار</h3>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <label class="label">ناوی دوکاندار</label>
+    <input class="input" id="newSkName" placeholder="ناو بنووسە">
+    <label class="label">ژمارەی مۆبایل</label>
+    <input class="input" id="newSkPhone" placeholder="ژمارە بنووسە">
+    <button class="btn success" onclick="saveShopkeeper()">✅ پاشەکەوتکردن</button>
+  `);
+}
+
+function saveShopkeeper() {
+  const name = document.getElementById('newSkName').value.trim();
+  const phone = document.getElementById('newSkPhone').value.trim();
+  if (!name) { showToast('⚠️ ناوی دوکاندار بنووسە'); return; }
+  
+  data.shopkeepers.push({
+    id: Date.now(),
+    name, phone,
+    invoices: []
+  });
+  save();
+  closeModal();
+  renderShopkeepers();
+  renderSellOptions();
+  showToast('✅ دوکاندار زیادکرا');
+}
+
+function openShopkeeper(id) {
+  const sk = data.shopkeepers.find(s => s.id === id);
+  if (!sk) return;
+
+  const invoicesHtml = (sk.invoices && sk.invoices.length > 0)
+    ? sk.invoices.map(inv => `
+        <div class="invoice-item" onclick="openInvoice(${sk.id}, ${inv.id})">
+          <h4>📄 فاکتوری #${inv.id.toString().slice(-6)}</h4>
+          <div class="meta">
+            <span>${new Date(inv.date).toLocaleDateString('ku')}</span>
+            <span class="amount">${inv.total.toLocaleString()} دینار</span>
+          </div>
+          <div class="meta">
+            <span>بڕی کاڵا: ${inv.items.reduce((a,b)=>a+b.qty,0)}</span>
+            <span>${inv.items.length} جۆر کاڵا</span>
+          </div>
+        </div>
+      `).join('')
+    : `<div class="empty"><div class="ico">📄</div><p>هیچ فاکتورێک نییە</p></div>`;
+
+  openModal(`
+    <div class="modal-header">
+      <h3>👤 ${sk.name}</h3>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="inv-detail">
+      <div class="row"><span>ژمارەی مۆبایل:</span><strong>${sk.phone || '—'}</strong></div>
+      <div class="row"><span>ژمارەی فاکتورەکان:</span><strong>${sk.invoices ? sk.invoices.length : 0}</strong></div>
+      <div class="row"><span>کۆی گشتی:</span><strong>${(sk.invoices||[]).reduce((a,b)=>a+b.total,0).toLocaleString()} دینار</strong></div>
+    </div>
+    <div class="card-title" style="margin-top:14px;">📋 فاکتورەکان</div>
+    ${invoicesHtml}
+    <div class="btn-row" style="margin-top:14px;">
+      <button class="btn danger btn-sm" onclick="deleteShopkeeper(${sk.id})" style="flex:1;">🗑️ سڕینەوە</button>
+    </div>
+  `);
+}
+
+function deleteShopkeeper(id) {
+  if (!confirm('دڵنیایت لە سڕینەوەی ئەم دوکاندارە؟')) return;
+  data.shopkeepers = data.shopkeepers.filter(s => s.id !== id);
+  save();
+  closeModal();
+  renderShopkeepers();
+  showToast('🗑️ سڕایەوە');
+}
+
+/* ============================================================
+   PRODUCTS (مخزن)
+   ============================================================ */
+let currentImage = null;
+
+function previewImage(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    currentImage = ev.target.result;
+    document.getElementById('imgUpload').innerHTML = `<img src="${currentImage}">`;
+  };
+  reader.readAsDataURL(file);
+}
+
+function addProduct() {
+  const name = document.getElementById('prodName').value.trim();
+  const price = parseFloat(document.getElementById('prodPrice').value) || 0;
+  const qty = parseInt(document.getElementById('prodQty').value) || 0;
+
+  if (!name) { showToast('⚠️ ناوی کاڵا بنووسە'); return; }
+
+  data.products.push({
+    id: Date.now(),
+    name, price,
+    qty,
+    image: currentImage
+  });
+  save();
+  resetProductForm();
+  renderProducts();
+  renderSellOptions();
+  renderSuggestions();
+  showToast('✅ کاڵا زیادکرا بۆ مخزن');
+}
+
+function resetProductForm() {
+  document.getElementById('prodName').value = '';
+  document.getElementById('prodPrice').value = '';
+  document.getElementById('prodQty').value = '0';
+  currentImage = null;
+  document.getElementById('imgUpload').innerHTML = `<div class="ph">📷</div><div class="txt">کلیک بکە بۆ هەڵبژاردنی وێنە</div>`;
+  document.getElementById('prodImg').value = '';
+}
+
+function renderProducts() {
+  const q = document.getElementById('searchProd').value.trim().toLowerCase();
+  const grid = document.getElementById('productsGrid');
+  const filtered = data.products.filter(p => p.name.toLowerCase().includes(q));
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><div class="ico">📦</div><p>هیچ کاڵایەک نییە</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(p => `
+    <div class="product-card" onclick="openProduct(${p.id})">
+      ${p.image 
+        ? `<img src="${p.image}" alt="${p.name}">` 
+        : `<div class="no-img">📦</div>`}
+      <div class="product-info">
+        <h4>${p.name}</h4>
+        <div class="price">${p.price.toLocaleString()} دینار</div>
+        <div class="qty">بڕ: ${p.qty}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openProduct(id) {
+  const p = data.products.find(x => x.id === id);
+  if (!p) return;
+
+  openModal(`
+    <div class="modal-header">
+      <h3>📦 ${p.name}</h3>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    ${p.image ? `<img src="${p.image}" style="width:100%;border-radius:12px;margin-bottom:12px;max-height:220px;object-fit:cover;">` : ''}
+    <div class="inv-detail">
+      <div class="row"><span>ناوی کاڵا:</span><strong>${p.name}</strong></div>
+      <div class="row"><span>نرخ:</span><strong>${p.price.toLocaleString()} دینار</strong></div>
+      <div class="row"><span>بڕی بەردەست:</span><strong>${p.qty}</strong></div>
+    </div>
+
+    <label class="label" style="margin-top:10px;">زیادکردنی بڕ</label>
+    <input type="number" class="input" id="editQty" value="${p.qty}" min="0">
+
+    <label class="label">گۆڕینی نرخ</label>
+    <input type="number" class="input" id="editPrice" value="${p.price}">
+
+    <div class="btn-row">
+      <button class="btn success" onclick="updateProduct(${p.id})" style="flex:1;">💾 پاشەکەوت</button>
+      <button class="btn danger" onclick="deleteProduct(${p.id})" style="flex:1;">🗑️ سڕینەوە</button>
+    </div>
+  `);
+}
+
+function updateProduct(id) {
+  const p = data.products.find(x => x.id === id);
+  if (!p) return;
+  p.qty = parseInt(document.getElementById('editQty').value) || 0;
+  p.price = parseFloat(document.getElementById('editPrice').value) || 0;
+  save();
+  closeModal();
+  renderProducts();
+  renderSellOptions();
+  renderSuggestions();
+  showToast('✅ نوێکرایەوە');
+}
+
+function deleteProduct(id) {
+  if (!confirm('دڵنیایت لە سڕینەوە؟')) return;
+  data.products = data.products.filter(x => x.id !== id);
+  save();
+  closeModal();
+  renderProducts();
+  renderSellOptions();
+  renderSuggestions();
+  showToast('🗑️ سڕایەوە');
+}
+
+/* ============================================================
+   SELL / STOCK IN (شت هێنان)
+   ============================================================ */
+function renderSellOptions() {
+  const skSel = document.getElementById('sellShopkeeper');
+  const prSel = document.getElementById('sellProduct');
+
+  skSel.innerHTML = data.shopkeepers.length
+    ? '<option value="">-- دوکاندار هەڵبژێرە --</option>' + data.shopkeepers.map(s => `<option value="${s.id}">${s.name}</option>`).join('')
+    : '<option value="">هیچ دوکاندارێک نییە</option>';
+
+  prSel.innerHTML = data.products.length
+    ? '<option value="">-- کاڵا هەڵبژێرە --</option>' + data.products.map(p => `<option value="${p.id}">${p.name} (${p.qty} بەردەست)</option>`).join('')
+    : '<option value="">هیچ کاڵایەک نییە</option>';
+}
+
+function addStock() {
+  const skId = parseInt(document.getElementById('sellShopkeeper').value);
+  const prId = parseInt(document.getElementById('sellProduct').value);
+  const qty = parseInt(document.getElementById('sellQty').value);
+
+  if (!skId) { showToast('⚠️ دوکاندار هەڵبژێرە'); return; }
+  if (!prId) { showToast('⚠️ کاڵا هەڵبژێرە'); return; }
+  if (!qty || qty <= 0) { showToast('⚠️ بڕی دروست بنووسە'); return; }
+
+  const sk = data.shopkeepers.find(s => s.id === skId);
+  const pr = data.products.find(p => p.id === prId);
+
+  // زیادکردنی بڕی کاڵا بۆ مخزن
+  pr.qty += qty;
+
+  // دروستکردنی فاکتور
+  const invoice = {
+    id: Date.now(),
+    date: new Date().toISOString(),
+    items: [{
+      productId: pr.id,
+      name: pr.name,
+      price: pr.price,
+      qty: qty
+    }],
+    total: pr.price * qty
+  };
+
+  sk.invoices = sk.invoices || [];
+  sk.invoices.push(invoice);
+
+  // تۆمارکردنی جوڵەی کۆگا
+  data.stockMovements.push({
+    id: Date.now(),
+    type: 'in',
+    productId: pr.id,
+    qty, date: new Date().toISOString()
+  });
+
+  save();
+  document.getElementById('sellQty').value = '1';
+  renderSellOptions();
+  renderSuggestions();
+  renderProducts();
+  renderShopkeepers();
+  showToast(`✅ ${qty} ${pr.name} زیادکرا بۆ مخزن`);
+}
+
+/* ============================================================
+   SUGGESTIONS
+   ============================================================ */
+function renderSuggestions() {
+  const el = document.getElementById('suggestionsList');
+  
+  if (data.stockMovements.length === 0) {
+    el.innerHTML = `<div class="empty"><div class="ico">💡</div><p>هێشتا هیچ کاڵایەک هاتوو نییە</p></div>`;
+    return;
+  }
+
+  // پێشنیاری کاڵاکان: ئەو کاڵایانەی کە زۆرترین جوڵەیان هەبووە
+  const counts = {};
+  data.stockMovements.forEach(m => {
+    counts[m.productId] = (counts[m.productId] || 0) + m.qty;
+  });
+
+  const sorted = Object.entries(counts)
+    .sort((a,b) => b[1] - a[1])
+    .slice(0, 5);
+
+  if (sorted.length === 0) {
+    el.innerHTML = `<div class="empty"><p>هیچ پێشنیارێک نییە</p></div>`;
+    return;
+  }
+
+  el.innerHTML = sorted.map(([pid, total]) => {
+    const p = data.products.find(x => x.id == pid);
+    if (!p) return '';
+    return `
+      <div class="shopkeeper" style="cursor:default;">
+        <div class="avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444);">🔥</div>
+        <div class="sk-info">
+          <h4>${p.name}</h4>
+          <p>${total} دانە هاتووە</p>
+        </div>
+        <div class="sk-badge" style="background:var(--warning);">پێشنیار</div>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ============================================================
+   INVOICE DETAIL
+   ============================================================ */
+function openInvoice(skId, invId) {
+  const sk = data.shopkeepers.find(s => s.id === skId);
+  if (!sk) return;
+  const inv = sk.invoices.find(i => i.id === invId);
+  if (!inv) return;
+
+  const itemsHtml = inv.items.map(item => `
+    <div class="row">
+      <span>${item.name} × ${item.qty}</span>
+      <strong>${(item.price * item.qty).toLocaleString()} دینار</strong>
+    </div>
+  `).join('');
+
+  openModal(`
+    <div class="modal-header">
+      <h3>📄 فاکتوری #${inv.id.toString().slice(-6)}</h3>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+
+    <div class="inv-detail">
+      <div class="row"><span>دوکاندار:</span><strong>${sk.name}</strong></div>
+      <div class="row"><span>ژمارەی مۆبایل:</span><strong>${sk.phone || '—'}</strong></div>
+      <div class="row"><span>بەروار:</span><strong>${new Date(inv.date).toLocaleString('ku')}</strong></div>
+    </div>
+
+    <div class="card-title" style="margin-top:14px;">🛒 کاڵاکانی فاکتور</div>
+    <div class="inv-detail">${itemsHtml}</div>
+
+    <div class="total-box">
+      کۆی گشتی: ${inv.total.toLocaleString()} دینار
+    </div>
+  `);
+}
+
+/* ============================================================
+   BACKUP
+   ============================================================ */
+function exportBackup() {
+  const backup = {
+    version: '1.0',
+    date: new Date().toISOString(),
+    data: data
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `stock-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('💾 باکەپ داگرت');
+}
+
+function importBackup(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const parsed = JSON.parse(ev.target.result);
+      if (parsed.data && parsed.data.shopkeepers) {
+        data = parsed.data;
+        save();
+        renderShopkeepers();
+        renderProducts();
+        renderSellOptions();
+        renderSuggestions();
+        showToast('✅ باکەپ گەڕێنرایەوە');
+      } else {
+        showToast('⚠️ فایلی باکەپ دروست نییە');
+      }
+    } catch(err) {
+      showToast('❌ هەڵە لە خوێندنەوەی فایل');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function clearAll() {
+  if (!confirm('دڵنیایت؟ هەموو داتاکان دەسڕێنەوە!')) return;
+  if (!confirm('ئەم کردارە ناگەڕێتەوە. دڵنیایت؟')) return;
+  data = { shopkeepers: [], products: [], invoices: [], stockMovements: [] };
+  save();
+  renderShopkeepers();
+  renderProducts();
+  renderSellOptions();
+  renderSuggestions();
+  showToast('🗑️ هەموو داتاکان سڕانەوە');
+}
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+function openModal(html) {
+  document.getElementById('modalContent').innerHTML = html;
+  document.getElementById('modal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('active');
+}
+
+document.getElementById('modal').addEventListener('click', (e) => {
+  if (e.target.id === 'modal') closeModal();
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function init() {
+  loadTheme();
+  load();
+  
+  // داتای نموونەیی ئەگەر بەتاڵ بێت
+  if (data.shopkeepers.length === 0 && data.products.length === 0) {
+    // هیچ داتایەکی نموونەیی دانانێین - بەکارهێنەر خۆی دروستی دەکات
+  }
+  
+  renderShopkeepers();
+  renderProducts();
+  renderSellOptions();
+  renderSuggestions();
+}
+
+init();
+</script>
 </body>
 </html>
