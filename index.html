@@ -157,9 +157,7 @@ body {
 
 /* ============ Search box ============ */
 .search-box { position: relative; margin-bottom: 14px; }
-
 .search-box input { padding-right: 44px; margin: 0; }
-
 .search-box::before {
   content: '🔍';
   position: absolute;
@@ -167,6 +165,176 @@ body {
   top: 50%;
   transform: translateY(-50%);
   font-size: 16px;
+  z-index: 2;
+}
+
+/* ============ Custom Searchable Select ============ */
+.cs-wrap {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.cs-input {
+  width: 100%;
+  padding: 12px 44px 12px 14px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.cs-input:focus, .cs-input.open {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79,70,229,0.15);
+}
+
+.cs-input::placeholder { color: var(--text2); }
+
+.cs-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: var(--text2);
+  pointer-events: none;
+  transition: 0.2s;
+}
+
+.cs-wrap.open .cs-icon { transform: translateY(-50%) rotate(180deg); }
+
+.cs-clear {
+  position: absolute;
+  left: 34px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--danger);
+  color: white;
+  border: none;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  font-size: 11px;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+.cs-wrap.has-value .cs-clear { display: flex; }
+
+.cs-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  left: 0;
+  background: var(--card);
+  border: 2px solid var(--primary);
+  border-radius: 12px;
+  max-height: 260px;
+  overflow-y: auto;
+  z-index: 500;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  display: none;
+  animation: fadeIn 0.2s;
+}
+
+.cs-wrap.open .cs-dropdown { display: block; }
+
+.cs-option {
+  padding: 11px 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+  transition: 0.15s;
+  font-size: 14px;
+}
+
+.cs-option:last-child { border-bottom: none; }
+.cs-option:hover, .cs-option.highlighted {
+  background: rgba(79,70,229,0.12);
+}
+
+.cs-option.selected {
+  background: rgba(79,70,229,0.2);
+  font-weight: 700;
+}
+
+.cs-option .badge {
+  margin-right: auto;
+  background: var(--primary);
+  color: white;
+  padding: 2px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.cs-option .badge.warn { background: var(--warning); }
+.cs-option .badge.good { background: var(--success); }
+
+.cs-option .badge.suggest {
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+}
+
+.cs-option .avatar-mini {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--header);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.cs-option .p-img {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.cs-option .p-no-img {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  background: var(--header);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.cs-empty {
+  padding: 18px;
+  text-align: center;
+  color: var(--text2);
+  font-size: 13px;
+}
+
+.cs-section-title {
+  padding: 8px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text2);
+  background: var(--bg);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: sticky;
+  top: 0;
   z-index: 2;
 }
 
@@ -381,7 +549,6 @@ body {
 }
 
 .inv-detail .row:last-child { border: none; }
-
 .inv-detail .row strong { color: var(--primary); }
 
 .total-box {
@@ -412,11 +579,7 @@ body {
   position: relative;
 }
 
-.img-upload img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-}
-
+.img-upload img { width: 100%; height: 100%; object-fit: cover; }
 .img-upload .ph { font-size: 36px; color: var(--text2); }
 .img-upload .txt { font-size: 12px; color: var(--text2); margin-top: 6px; }
 
@@ -467,6 +630,8 @@ body {
   transition: 0.3s;
   pointer-events: none;
   box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  max-width: 90%;
+  text-align: center;
 }
 
 .toast.show { transform: translateX(50%) translateY(0); opacity: 1; }
@@ -485,6 +650,31 @@ body {
 .backup-box p { font-size: 13px; color: var(--text2); margin-bottom: 12px; }
 
 .file-input { display: none; }
+
+/* ============ Preview Box ============ */
+.preview-box {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.preview-box .lbl {
+  font-size: 11px;
+  color: var(--text2);
+  margin-bottom: 2px;
+}
+
+.preview-box .val {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+}
 
 @media (max-width: 400px) {
   .product-grid { grid-template-columns: repeat(2, 1fr); }
@@ -505,7 +695,7 @@ body {
 
 <div class="container">
 
-  <!-- ========== PAGE: HOME (کەسەکان) ========== -->
+  <!-- ========== PAGE: HOME ========== -->
   <div class="page active" id="page-home">
     <div class="search-box">
       <input type="text" class="input" placeholder="گەڕان بەدوای ناوی دوکاندار..." id="searchSk" oninput="renderShopkeepers()">
@@ -526,13 +716,26 @@ body {
   <div class="page" id="page-products">
     <div class="card">
       <div class="card-title">🛒 شت هێنان (وەرگرتنی کاڵا)</div>
-      <label class="label">دوکاندار</label>
-      <select class="select" id="sellShopkeeper"></select>
 
-      <label class="label">کاڵا</label>
-      <select class="select" id="sellProduct"></select>
+      <label class="label">👤 دوکاندار (گەڕان یان هەڵبژاردن)</label>
+      <div class="cs-wrap" id="wrapSk">
+        <input type="text" class="cs-input" id="csSkInput" placeholder="ناوی دوکاندار بنووسە یان هەڵبژێرە..." autocomplete="off">
+        <button class="cs-clear" onclick="clearSelection('sk')">✕</button>
+        <span class="cs-icon">▼</span>
+        <div class="cs-dropdown" id="csSkDropdown"></div>
+      </div>
 
-      <label class="label">بڕی هاتنی کاڵا</label>
+      <label class="label">📦 کاڵا (گەڕان یان هەڵبژاردن)</label>
+      <div class="cs-wrap" id="wrapPr">
+        <input type="text" class="cs-input" id="csPrInput" placeholder="ناوی کاڵا بنووسە یان هەڵبژێرە..." autocomplete="off">
+        <button class="cs-clear" onclick="clearSelection('pr')">✕</button>
+        <span class="cs-icon">▼</span>
+        <div class="cs-dropdown" id="csPrDropdown"></div>
+      </div>
+
+      <div id="selectedPreview"></div>
+
+      <label class="label">🔢 بڕی هاتنی کاڵا</label>
       <input type="number" class="input" id="sellQty" placeholder="بڕی کاڵا بنووسە" min="1" value="1">
 
       <button class="btn success" onclick="addStock()">✅ زیادکردنی بڕی هاتوو</button>
@@ -544,7 +747,7 @@ body {
     </div>
   </div>
 
-  <!-- ========== PAGE: STORAGE (مخزن) ========== -->
+  <!-- ========== PAGE: STORAGE ========== -->
   <div class="page" id="page-storage">
     <div class="search-box">
       <input type="text" class="input" placeholder="گەڕان بەدوای کاڵاکان..." id="searchProd" oninput="renderProducts()">
@@ -608,20 +811,16 @@ body {
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
   <button class="nav-item active" onclick="switchPage('home',this,'کەسەکان')">
-    <span class="icon">👥</span>
-    <span>کەسەکان</span>
+    <span class="icon">👥</span><span>کەسەکان</span>
   </button>
   <button class="nav-item" onclick="switchPage('products',this,'شت هێنان')">
-    <span class="icon">🛒</span>
-    <span>شت هێنان</span>
+    <span class="icon">🛒</span><span>شت هێنان</span>
   </button>
   <button class="nav-item" onclick="switchPage('storage',this,'مخزن')">
-    <span class="icon">📦</span>
-    <span>مخزن</span>
+    <span class="icon">📦</span><span>مخزن</span>
   </button>
   <button class="nav-item" onclick="switchPage('backup',this,'باکەپ')">
-    <span class="icon">💾</span>
-    <span>باکەپ</span>
+    <span class="icon">💾</span><span>باکەپ</span>
   </button>
 </div>
 
@@ -643,6 +842,9 @@ let data = {
   invoices: [],
   stockMovements: []
 };
+
+let selectedSk = null;
+let selectedPr = null;
 
 function save() {
   localStorage.setItem('stockSystem', JSON.stringify(data));
@@ -681,9 +883,9 @@ function switchPage(page, btn, subtitle) {
   document.getElementById('page-' + page).classList.add('active');
   btn.classList.add('active');
   document.getElementById('pageSubtitle').textContent = subtitle;
-  
+
   if (page === 'home') renderShopkeepers();
-  if (page === 'products') { renderSellOptions(); renderSuggestions(); }
+  if (page === 'products') { renderSuggestions(); }
   if (page === 'storage') renderProducts();
 }
 
@@ -700,7 +902,7 @@ function showToast(msg) {
 }
 
 /* ============================================================
-   SHOPKEEPERS
+   SHOPKEEPERS (HOME)
    ============================================================ */
 function renderShopkeepers() {
   const q = document.getElementById('searchSk').value.trim().toLowerCase();
@@ -745,16 +947,11 @@ function saveShopkeeper() {
   const name = document.getElementById('newSkName').value.trim();
   const phone = document.getElementById('newSkPhone').value.trim();
   if (!name) { showToast('⚠️ ناوی دوکاندار بنووسە'); return; }
-  
-  data.shopkeepers.push({
-    id: Date.now(),
-    name, phone,
-    invoices: []
-  });
+
+  data.shopkeepers.push({ id: Date.now(), name, phone, invoices: [] });
   save();
   closeModal();
   renderShopkeepers();
-  renderSellOptions();
   showToast('✅ دوکاندار زیادکرا');
 }
 
@@ -806,7 +1003,7 @@ function deleteShopkeeper(id) {
 }
 
 /* ============================================================
-   PRODUCTS (مخزن)
+   PRODUCTS (STORAGE)
    ============================================================ */
 let currentImage = null;
 
@@ -828,16 +1025,10 @@ function addProduct() {
 
   if (!name) { showToast('⚠️ ناوی کاڵا بنووسە'); return; }
 
-  data.products.push({
-    id: Date.now(),
-    name, price,
-    qty,
-    image: currentImage
-  });
+  data.products.push({ id: Date.now(), name, price, qty, image: currentImage });
   save();
   resetProductForm();
   renderProducts();
-  renderSellOptions();
   renderSuggestions();
   showToast('✅ کاڵا زیادکرا بۆ مخزن');
 }
@@ -863,9 +1054,7 @@ function renderProducts() {
 
   grid.innerHTML = filtered.map(p => `
     <div class="product-card" onclick="openProduct(${p.id})">
-      ${p.image 
-        ? `<img src="${p.image}" alt="${p.name}">` 
-        : `<div class="no-img">📦</div>`}
+      ${p.image ? `<img src="${p.image}" alt="${p.name}">` : `<div class="no-img">📦</div>`}
       <div class="product-info">
         <h4>${p.name}</h4>
         <div class="price">${p.price.toLocaleString()} دینار</div>
@@ -912,7 +1101,6 @@ function updateProduct(id) {
   save();
   closeModal();
   renderProducts();
-  renderSellOptions();
   renderSuggestions();
   showToast('✅ نوێکرایەوە');
 }
@@ -923,69 +1111,321 @@ function deleteProduct(id) {
   save();
   closeModal();
   renderProducts();
-  renderSellOptions();
   renderSuggestions();
   showToast('🗑️ سڕایەوە');
 }
 
 /* ============================================================
-   SELL / STOCK IN (شت هێنان)
+   CUSTOM SEARCHABLE SELECT (گەڕان + پێشنیار)
    ============================================================ */
-function renderSellOptions() {
-  const skSel = document.getElementById('sellShopkeeper');
-  const prSel = document.getElementById('sellProduct');
+function setupCustomSelect(wrapId, inputId, dropdownId, type) {
+  const wrap = document.getElementById(wrapId);
+  const input = document.getElementById(inputId);
+  const dropdown = document.getElementById(dropdownId);
 
-  skSel.innerHTML = data.shopkeepers.length
-    ? '<option value="">-- دوکاندار هەڵبژێرە --</option>' + data.shopkeepers.map(s => `<option value="${s.id}">${s.name}</option>`).join('')
-    : '<option value="">هیچ دوکاندارێک نییە</option>';
+  // کرانەوە لە focus
+  input.addEventListener('focus', () => {
+    wrap.classList.add('open');
+    renderDropdown(type);
+  });
 
-  prSel.innerHTML = data.products.length
-    ? '<option value="">-- کاڵا هەڵبژێرە --</option>' + data.products.map(p => `<option value="${p.id}">${p.name} (${p.qty} بەردەست)</option>`).join('')
-    : '<option value="">هیچ کاڵایەک نییە</option>';
+  // گەڕان
+  input.addEventListener('input', () => {
+    wrap.classList.add('open');
+    if (input.value.trim() === '') {
+      // ئەگەر بەتاڵ کرایەوە، هەڵبژاردنەکە لابردە
+      if (type === 'sk') selectedSk = null;
+      if (type === 'pr') selectedPr = null;
+      wrap.classList.remove('has-value');
+    } else {
+      wrap.classList.add('has-value');
+    }
+    renderDropdown(type);
+  });
+
+  // داخستن کاتێک کلیک لە دەرەوە دەکرێت
+  document.addEventListener('click', (e) => {
+    if (!wrap.contains(e.target)) {
+      wrap.classList.remove('open');
+    }
+  });
 }
 
-function addStock() {
-  const skId = parseInt(document.getElementById('sellShopkeeper').value);
-  const prId = parseInt(document.getElementById('sellProduct').value);
-  const qty = parseInt(document.getElementById('sellQty').value);
+function renderDropdown(type) {
+  const isSk = type === 'sk';
+  const input = document.getElementById(isSk ? 'csSkInput' : 'csPrInput');
+  const dropdown = document.getElementById(isSk ? 'csSkDropdown' : 'csPrDropdown');
+  const q = input.value.trim().toLowerCase();
 
-  if (!skId) { showToast('⚠️ دوکاندار هەڵبژێرە'); return; }
-  if (!prId) { showToast('⚠️ کاڵا هەڵبژێرە'); return; }
+  if (isSk) {
+    // ============== دوکانداران ==============
+    let all = data.shopkeepers.map(s => ({
+      ...s,
+      invoiceCount: s.invoices ? s.invoices.length : 0,
+      totalAmount: (s.invoices || []).reduce((a,b)=>a+b.total, 0)
+    }));
+
+    // فلتەرکردن بەپێی گەڕان
+    let filtered = all.filter(s => s.name.toLowerCase().includes(q) || (s.phone || '').includes(q));
+
+    // ئەگەر گەڕان بەتاڵ بوو: پێشنیاری ئەوانەی زۆرترین فاکتوریان هەیە
+    let suggested = [];
+    if (q === '') {
+      suggested = [...all]
+        .filter(s => s.invoiceCount > 0)
+        .sort((a,b) => b.invoiceCount - a.invoiceCount || b.totalAmount - a.totalAmount)
+        .slice(0, 3);
+    }
+
+    let html = '';
+
+    // بەشی پێشنیارەکان
+    if (suggested.length > 0 && q === '') {
+      html += `<div class="cs-section-title">⭐ پێشنیارکراو (چالاکترین)</div>`;
+      html += suggested.map(s => `
+        <div class="cs-option ${selectedSk === s.id ? 'selected' : ''}" onclick="selectSk(${s.id})">
+          <div class="avatar-mini">${s.name.charAt(0)}</div>
+          <div style="flex:1;">
+            <div style="font-weight:600;">${s.name}</div>
+            <div style="font-size:11px;color:var(--text2);">${s.phone || 'بێ ژمارە'}</div>
+          </div>
+          <span class="badge suggest">🔥 ${s.invoiceCount}</span>
+        </div>
+      `).join('');
+    }
+
+    // ئەگەر گەڕان هەبوو، لیستی گشتی پیشان بدە
+    if (q !== '') {
+      if (filtered.length === 0) {
+        html = `<div class="cs-empty">هیچ دوکاندارێک نەدۆزرایەوە<br><small>ناوی دوکاندار بنووسە</small></div>`;
+        dropdown.innerHTML = html;
+        return;
+      }
+      html = `<div class="cs-section-title">🔍 ئەنجامی گەڕان (${filtered.length})</div>`;
+      html += filtered.map(s => `
+        <div class="cs-option ${selectedSk === s.id ? 'selected' : ''}" onclick="selectSk(${s.id})">
+          <div class="avatar-mini">${s.name.charAt(0)}</div>
+          <div style="flex:1;">
+            <div style="font-weight:600;">${highlightText(s.name, q)}</div>
+            <div style="font-size:11px;color:var(--text2);">${s.phone || 'بێ ژمارە'}</div>
+          </div>
+          <span class="badge ${s.invoiceCount > 0 ? 'good' : ''}">${s.invoiceCount} فاکتور</span>
+        </div>
+      `).join('');
+    } else if (all.length > 0) {
+      // لیستی گشتی دوکانداران (کاتێک گەڕان نییە)
+      html += `<div class="cs-section-title">👥 هەموو دوکانداران (${all.length})</div>`;
+      html += all.map(s => `
+        <div class="cs-option ${selectedSk === s.id ? 'selected' : ''}" onclick="selectSk(${s.id})">
+          <div class="avatar-mini">${s.name.charAt(0)}</div>
+          <div style="flex:1;">
+            <div style="font-weight:600;">${s.name}</div>
+            <div style="font-size:11px;color:var(--text2);">${s.phone || 'بێ ژمارە'}</div>
+          </div>
+          <span class="badge ${s.invoiceCount > 0 ? 'good' : ''}">${s.invoiceCount} فاکتور</span>
+        </div>
+      `).join('');
+    } else {
+      html = `<div class="cs-empty">هیچ دوکاندارێک نییە<br><small>سەرەتا دوکاندار زیاد بکە</small></div>`;
+    }
+
+    dropdown.innerHTML = html;
+
+  } else {
+    // ============== کاڵاکان ==============
+    let all = data.products.map(p => {
+      // بڕی هاتوو بۆ ئەم کاڵایە
+      const totalIn = data.stockMovements
+        .filter(m => m.productId === p.id && m.type === 'in')
+        .reduce((a,b) => a + b.qty, 0);
+      return { ...p, totalIn };
+    });
+
+    let filtered = all.filter(p => p.name.toLowerCase().includes(q));
+
+    // پێشنیار: ئەو کاڵایانەی زۆرترین جوڵەیان هەبووە
+    let suggested = [];
+    if (q === '') {
+      suggested = [...all]
+        .filter(p => p.totalIn > 0)
+        .sort((a,b) => b.totalIn - a.totalIn)
+        .slice(0, 3);
+    }
+
+    let html = '';
+
+    // بەشی پێشنیاری کاڵاکان
+    if (suggested.length > 0 && q === '') {
+      html += `<div class="cs-section-title">💡 پێشنیاری کاڵاکان (زۆرترین هاتوو)</div>`;
+      html += suggested.map(p => `
+        <div class="cs-option ${selectedPr === p.id ? 'selected' : ''}" onclick="selectPr(${p.id})">
+          ${p.image 
+            ? `<img src="${p.image}" class="p-img">` 
+            : `<div class="p-no-img">📦</div>`}
+          <div style="flex:1;">
+            <div style="font-weight:600;">${p.name}</div>
+            <div style="font-size:11px;color:var(--text2);">${p.price.toLocaleString()} دینار • بڕ: ${p.qty}</div>
+          </div>
+          <span class="badge suggest">🔥 ${p.totalIn}</span>
+        </div>
+      `).join('');
+    }
+
+    // ئەگەر گەڕان هەبوو
+    if (q !== '') {
+      if (filtered.length === 0) {
+        html = `<div class="cs-empty">هیچ کاڵایەک نەدۆزرایەوە<br><small>ناوی کاڵا بنووسە</small></div>`;
+        dropdown.innerHTML = html;
+        return;
+      }
+      html = `<div class="cs-section-title">🔍 ئەنجامی گەڕان (${filtered.length})</div>`;
+      html += filtered.map(p => `
+        <div class="cs-option ${selectedPr === p.id ? 'selected' : ''}" onclick="selectPr(${p.id})">
+          ${p.image 
+            ? `<img src="${p.image}" class="p-img">` 
+            : `<div class="p-no-img">📦</div>`}
+          <div style="flex:1;">
+            <div style="font-weight:600;">${highlightText(p.name, q)}</div>
+            <div style="font-size:11px;color:var(--text2);">${p.price.toLocaleString()} دینار</div>
+          </div>
+          <span class="badge ${p.qty > 0 ? 'good' : 'warn'}">بڕ: ${p.qty}</span>
+        </div>
+      `).join('');
+    } else if (all.length > 0) {
+      html += `<div class="cs-section-title">📦 هەموو کاڵاکان (${all.length})</div>`;
+      html += all.map(p => `
+        <div class="cs-option ${selectedPr === p.id ? 'selected' : ''}" onclick="selectPr(${p.id})">
+          ${p.image 
+            ? `<img src="${p.image}" class="p-img">` 
+            : `<div class="p-no-img">📦</div>`}
+          <div style="flex:1;">
+            <div style="font-weight:600;">${p.name}</div>
+            <div style="font-size:11px;color:var(--text2);">${p.price.toLocaleString()} دینار</div>
+          </div>
+          <span class="badge ${p.qty > 0 ? 'good' : 'warn'}">بڕ: ${p.qty}</span>
+        </div>
+      `).join('');
+    } else {
+      html = `<div class="cs-empty">هیچ کاڵایەک نییە<br><small>سەرەتا کاڵا زیاد بکە لە مخزن</small></div>`;
+    }
+
+    dropdown.innerHTML = html;
+  }
+}
+
+// ڕەنگکردنی دەقی گەڕان
+function highlightText(text, q) {
+  if (!q) return text;
+  const regex = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  return text.replace(regex, '<mark style="background:var(--warning);color:#000;border-radius:3px;padding:0 3px;">$1</mark>');
+}
+
+// هەڵبژاردنی دوکاندار
+function selectSk(id) {
+  const sk = data.shopkeepers.find(s => s.id === id);
+  if (!sk) return;
+  selectedSk = id;
+  const input = document.getElementById('csSkInput');
+  input.value = sk.name;
+  document.getElementById('wrapSk').classList.remove('open');
+  document.getElementById('wrapSk').classList.add('has-value');
+  renderSelectedPreview();
+}
+
+// هەڵبژاردنی کاڵا
+function selectPr(id) {
+  const p = data.products.find(x => x.id === id);
+  if (!p) return;
+  selectedPr = id;
+  const input = document.getElementById('csPrInput');
+  input.value = p.name;
+  document.getElementById('wrapPr').classList.remove('open');
+  document.getElementById('wrapPr').classList.add('has-value');
+  renderSelectedPreview();
+}
+
+// سڕینەوەی هەڵبژاردن
+function clearSelection(type) {
+  if (type === 'sk') {
+    selectedSk = null;
+    document.getElementById('csSkInput').value = '';
+    document.getElementById('wrapSk').classList.remove('has-value');
+  } else {
+    selectedPr = null;
+    document.getElementById('csPrInput').value = '';
+    document.getElementById('wrapPr').classList.remove('has-value');
+  }
+  renderSelectedPreview();
+}
+
+// پیشاندانی هەڵبژاردنەکان
+function renderSelectedPreview() {
+  const el = document.getElementById('selectedPreview');
+  if (!selectedSk && !selectedPr) { el.innerHTML = ''; return; }
+
+  let html = '';
+  if (selectedSk) {
+    const sk = data.shopkeepers.find(s => s.id === selectedSk);
+    if (sk) html += `
+      <div class="preview-box">
+        <div class="avatar-mini" style="width:36px;height:36px;border-radius:50%;background:var(--header);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;">${sk.name.charAt(0)}</div>
+        <div>
+          <div class="lbl">دوکاندار هەڵبژێردراو</div>
+          <div class="val">${sk.name}</div>
+        </div>
+      </div>`;
+  }
+  if (selectedPr) {
+    const p = data.products.find(x => x.id === selectedPr);
+    if (p) html += `
+      <div class="preview-box">
+        ${p.image ? `<img src="${p.image}" style="width:36px;height:36px;border-radius:8px;object-fit:cover;">` : `<div style="width:36px;height:36px;border-radius:8px;background:var(--header);display:flex;align-items:center;justify-content:center;">📦</div>`}
+        <div>
+          <div class="lbl">کاڵای هەڵبژێردراو</div>
+          <div class="val">${p.name} — ${p.price.toLocaleString()} دینار</div>
+        </div>
+      </div>`;
+  }
+  el.innerHTML = html;
+}
+
+/* ============================================================
+   ADD STOCK (شت هێنان)
+   ============================================================ */
+function addStock() {
+  if (!selectedSk) { showToast('⚠️ دوکاندار هەڵبژێرە'); return; }
+  if (!selectedPr) { showToast('⚠️ کاڵا هەڵبژێرە'); return; }
+
+  const qty = parseInt(document.getElementById('sellQty').value);
   if (!qty || qty <= 0) { showToast('⚠️ بڕی دروست بنووسە'); return; }
 
-  const sk = data.shopkeepers.find(s => s.id === skId);
-  const pr = data.products.find(p => p.id === prId);
+  const sk = data.shopkeepers.find(s => s.id === selectedSk);
+  const pr = data.products.find(p => p.id === selectedPr);
 
-  // زیادکردنی بڕی کاڵا بۆ مخزن
   pr.qty += qty;
 
-  // دروستکردنی فاکتور
   const invoice = {
     id: Date.now(),
     date: new Date().toISOString(),
-    items: [{
-      productId: pr.id,
-      name: pr.name,
-      price: pr.price,
-      qty: qty
-    }],
+    items: [{ productId: pr.id, name: pr.name, price: pr.price, qty }],
     total: pr.price * qty
   };
 
   sk.invoices = sk.invoices || [];
   sk.invoices.push(invoice);
 
-  // تۆمارکردنی جوڵەی کۆگا
   data.stockMovements.push({
     id: Date.now(),
     type: 'in',
     productId: pr.id,
-    qty, date: new Date().toISOString()
+    qty,
+    date: new Date().toISOString()
   });
 
   save();
   document.getElementById('sellQty').value = '1';
-  renderSellOptions();
+  clearSelection('sk');
+  clearSelection('pr');
   renderSuggestions();
   renderProducts();
   renderShopkeepers();
@@ -993,26 +1433,22 @@ function addStock() {
 }
 
 /* ============================================================
-   SUGGESTIONS
+   SUGGESTIONS (پێشنیاری کاڵاکان لە خوارەوە)
    ============================================================ */
 function renderSuggestions() {
   const el = document.getElementById('suggestionsList');
-  
+
   if (data.stockMovements.length === 0) {
     el.innerHTML = `<div class="empty"><div class="ico">💡</div><p>هێشتا هیچ کاڵایەک هاتوو نییە</p></div>`;
     return;
   }
 
-  // پێشنیاری کاڵاکان: ئەو کاڵایانەی کە زۆرترین جوڵەیان هەبووە
   const counts = {};
   data.stockMovements.forEach(m => {
     counts[m.productId] = (counts[m.productId] || 0) + m.qty;
   });
 
-  const sorted = Object.entries(counts)
-    .sort((a,b) => b[1] - a[1])
-    .slice(0, 5);
-
+  const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 5);
   if (sorted.length === 0) {
     el.innerHTML = `<div class="empty"><p>هیچ پێشنیارێک نییە</p></div>`;
     return;
@@ -1022,16 +1458,23 @@ function renderSuggestions() {
     const p = data.products.find(x => x.id == pid);
     if (!p) return '';
     return `
-      <div class="shopkeeper" style="cursor:default;">
+      <div class="shopkeeper" onclick="quickSelectProduct(${p.id})">
         <div class="avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444);">🔥</div>
         <div class="sk-info">
           <h4>${p.name}</h4>
           <p>${total} دانە هاتووە</p>
         </div>
-        <div class="sk-badge" style="background:var(--warning);">پێشنیار</div>
+        <div class="sk-badge" style="background:var(--warning);">هەڵبژێرە</div>
       </div>
     `;
   }).join('');
+}
+
+// هەڵبژاردنی خێرای کاڵا لە پێشنیارەکان
+function quickSelectProduct(id) {
+  selectPr(id);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showToast('✅ کاڵا هەڵبژێردرا');
 }
 
 /* ============================================================
@@ -1065,9 +1508,7 @@ function openInvoice(skId, invId) {
     <div class="card-title" style="margin-top:14px;">🛒 کاڵاکانی فاکتور</div>
     <div class="inv-detail">${itemsHtml}</div>
 
-    <div class="total-box">
-      کۆی گشتی: ${inv.total.toLocaleString()} دینار
-    </div>
+    <div class="total-box">کۆی گشتی: ${inv.total.toLocaleString()} دینار</div>
   `);
 }
 
@@ -1075,11 +1516,7 @@ function openInvoice(skId, invId) {
    BACKUP
    ============================================================ */
 function exportBackup() {
-  const backup = {
-    version: '1.0',
-    date: new Date().toISOString(),
-    data: data
-  };
+  const backup = { version: '1.0', date: new Date().toISOString(), data };
   const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1102,7 +1539,6 @@ function importBackup(e) {
         save();
         renderShopkeepers();
         renderProducts();
-        renderSellOptions();
         renderSuggestions();
         showToast('✅ باکەپ گەڕێنرایەوە');
       } else {
@@ -1122,7 +1558,6 @@ function clearAll() {
   save();
   renderShopkeepers();
   renderProducts();
-  renderSellOptions();
   renderSuggestions();
   showToast('🗑️ هەموو داتاکان سڕانەوە');
 }
@@ -1149,15 +1584,10 @@ document.getElementById('modal').addEventListener('click', (e) => {
 function init() {
   loadTheme();
   load();
-  
-  // داتای نموونەیی ئەگەر بەتاڵ بێت
-  if (data.shopkeepers.length === 0 && data.products.length === 0) {
-    // هیچ داتایەکی نموونەیی دانانێین - بەکارهێنەر خۆی دروستی دەکات
-  }
-  
+  setupCustomSelect('wrapSk', 'csSkInput', 'csSkDropdown', 'sk');
+  setupCustomSelect('wrapPr', 'csPrInput', 'csPrDropdown', 'pr');
   renderShopkeepers();
   renderProducts();
-  renderSellOptions();
   renderSuggestions();
 }
 
